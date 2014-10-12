@@ -1,5 +1,26 @@
 # Troubleshooting
 
+- Make sure all the clocks are in sync on all the nodes:  `ntpq -p`
+- Make sure qpidd is running on all the nodes:  `service qpidd status`
+- MySQL is running and responsive.  
+
+
+1. Run on the controller node as root:
+
+```
+    nova-manage service list 
+    
+    [root@controller-01 ~]$ nova-manage service list
+    Binary           Host                                 Zone             Status     State Updated_At
+    nova-conductor   controller-01.mgmt                   internal         enabled    :-)   2014-10-12 17:03:32
+    nova-scheduler   controller-01.mgmt                   internal         enabled    :-)   2014-10-12 17:03:32
+    nova-consoleauth controller-01.mgmt                   internal         enabled    :-)   2014-10-12 17:03:32
+    nova-cert        controller-01.mgmt                   internal         enabled    :-)   2014-10-12 17:03:32
+    nova-compute     compute-01.mgmt                      nova             enabled    :-)   2014-10-12 17:03:39
+    nova-compute     compute-02.mgmt                      nova             enabled    :-)   2014-10-12 17:03:38
+```
+
+2. 
 
 # Logs and /etc files
 
