@@ -76,6 +76,8 @@ Compute
 
 ```
 
+[1]: https://www.packtpub.com/books/content/troubleshooting-openstack-cloud-computing
+
 
 
 
