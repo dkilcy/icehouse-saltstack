@@ -138,12 +138,10 @@ openstack-config --set /etc/nova/nova.conf DEFAULT glance_host $CONTROLLER
 
 service libvirtd start
 service messagebus start
+service openstack-nova-compute start
 
 chkconfig libvirtd on
 chkconfig messagebus on
-
-service openstack-nova-compute start
-
 chkconfig openstack-nova-compute on
 ```
 

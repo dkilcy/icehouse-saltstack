@@ -24,12 +24,13 @@ eth2 handles VM network
 Later on eth3 and eth4 will be used for bonding to increase network performance.
 
 Node           | eth0          | eth1           | eth2           | eth3           | eth4
--------------- | ------------- | -------------- | -------------- | -------------- | -------------- |  
-util-01        | 10.0.0.5      | 192.168.1.105  | N/A            | N/A            | N/A            |
-controller-01  | 10.0.0.11     | 192.168.1.111  |                |                |                |
+-------------- | ------------- | -------------- | -------------- | -------------- | -------------- |
+workstation-01 | 10.0.0.5      | 192.168.1.5    |                |                |                |
+workstation-02 | 10.0.0.6      | 192.168.1.6    |                |                |                |
+controller-01  | 10.0.0.11     | 192.168.1.11   |                |                |                |
 network-01     | 10.0.0.21     | External       | 10.0.1.21      |                |                |
-compute-01     | 10.0.0.31     |                | 10.0.1.31      |                | N/A            |
-compute-02     | 10.0.0.32     |                | 10.0.1.32      |                | N/A            |
+compute-01     | 10.0.0.31     |                | 10.0.1.31      |                |                |
+compute-02     | 10.0.0.32     |                | 10.0.1.32      |                |                |
 
 ## Overview
 
@@ -38,9 +39,10 @@ For each node (controller, network and compute):
 * Configure Networking
 * 24-hour Prine95 stress test hardware 
 
-## Controller
 
-### Install CentOS 6.5
+## Manual Install
+
+### Controller
 
 These steps are all performed using the console on the SuperMicros. Use a USB keyboard and VGA monitor connected to the backplane of the SuperMicro.
 
