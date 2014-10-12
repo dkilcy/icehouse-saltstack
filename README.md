@@ -9,9 +9,10 @@ SaltStack will be used to automate the deployment of the controller, network and
 The first phase of the project will bootstrap the initial multi-node architecture.
 
 Additional phases will include:
-- Redundant controller and network nodes for HA/disaster recovery
+- Redundant controller and network nodes for HA/disaster recovery and performance
 - Swift and Cinder Object/Block storage
 - Celiometer and Horizon 
+- Ethernet bonding
 
 I started this project because of the lack of information about Neutron networking and setting up OpenStack in real production environments.  Sure you can use "devstack" to do the work for you, but it does not mimic a real production setup.  In addition I wanted to install and configure each of the components manually to get a better understanding of the ecosystem, and to do it in an automated and reproducable way.  By authoring my own Salt formulas for deployment the ultimate goal is to be able to deploy an entire OpenStack ecosystem ranging from 3 to 3000 systems with a single Salt highstate command.
 
@@ -19,16 +20,21 @@ To sum it up, I view "devstack" as reading a book about math.  You do not learn 
 
 ## Overview
 
-CentOS 6.5 64-bit on all systems.
-SaltStack for configuration.
+* OpenStack Icehouse release
+* CentOS 6.5 64-bit on all systems.
+* Kickstart scripts that boot from the utility node via HTTP for bare-metal configuration, no manual installs here.
+* SaltStack for configuration
+* CentOS repository mirror on the utility nodes.\
 
-Implement 4 node OpenStack cloud consisting of
-* 1 utility node
+The first phase will implement 4 node OpenStack cloud consisting of:
+* 2 utility nodes 
 * 1 controller node
 * 1 network node
 * 2 compute nodes
+* 2 TP-Link L2 managed switches for redundancy.
 
-An additional utility node
+2 additional nodes will be added later for controller and network node redundancy/peformance.
+
  
 ### Installation overview:
 
