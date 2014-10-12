@@ -194,28 +194,28 @@ compute_ml2_plugin_5:
     - parameter: local_ip
     - value: {{ instance_tunnels_interface_ip_address }}
 
-compute_ml2_plugin_:
+compute_ml2_plugin_6:
   openstack_config.present:
     - filename: /etc/neutron/plugins/ml2/ml2_conf.ini
     - section: ovs
     - parameter: tunnel_type
     - value: gre
 
-compute_ml2_plugin_6:
+compute_ml2_plugin_7:
   openstack_config.present:
     - filename: /etc/neutron/plugins/ml2/ml2_conf.ini
     - section: ovs
     - parameter: enable_tunneling
     - value: 'True'
 
-compute_ml2_plugin_7:
+compute_ml2_plugin_8:
   openstack_config.present:
     - filename: /etc/neutron/plugins/ml2/ml2_conf.ini
     - section: securitygroup
     - parameter: firewall_driver
     - value: neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver
 
-compute_ml2_plugin_8:
+compute_ml2_plugin_9:
   openstack_config.present:
     - filename: /etc/neutron/plugins/ml2/ml2_conf.ini
     - section: securitygroup

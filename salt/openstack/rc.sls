@@ -2,7 +2,7 @@
 
 auth_setup:
   file.managed:
-    - name: /home/devops/auth-openrc.sh
+    - name: /home/devops/openstack/auth-openrc.sh
     - user: devops
     - group: devops
     - mode: 755 
@@ -22,7 +22,7 @@ auth_setup:
 
 admin_setup:
   file.managed:
-    - name: /home/devops/admin-openrc.sh
+    - name: /home/devops/openstack/admin-openrc.sh
     - user: devops
     - group: devops
     - mode: 755 
@@ -35,7 +35,7 @@ admin_setup:
 
 demo_setup:
   file.managed:
-    - name: /home/devops/demo-openrc.sh
+    - name: /home/devops/openstack/demo-openrc.sh
     - user: devops
     - group: devops
     - mode: 755 
