@@ -99,6 +99,36 @@ The compute nodes will also run Cinder and Swift components.
 * 4 x Onboard NIC
 
 
+#### Network topology
+
+There are 3 networks.
+
+Network                     | Domain	
+--------------------------- | ------
+OpenStack Internal Network  | .mgmt
+Public Network              | .pub
+VM Traffic Network          | .vm
+
+#### IP Address and Ethernet assignments
+
+For simplicity,
+eth0 handles internal network
+eth1 handles public network
+eth2 handles VM network
+
+Later on eth3 and eth4 will be used for bonding to increase network performance.
+
+Node           | eth0          | eth1           | eth2           | eth3           | eth4
+-------------- | ------------- | -------------- | -------------- | -------------- | -------------- |
+workstation-01 | 10.0.0.5      | 192.168.1.5    |                |                |                |
+workstation-02 | 10.0.0.6      | 192.168.1.6    |                |                |                |
+controller-01  | 10.0.0.11     | 192.168.1.11   |                |                |                |
+network-01     | 10.0.0.21     | External       | 10.0.1.21      |                |                |
+compute-01     | 10.0.0.31     |                | 10.0.1.31      |                |                |
+compute-02     | 10.0.0.32     |                | 10.0.1.32      |                |                |
+
+#### Hardware References:
+
 [1]: http://www.newegg.com/Product/Product.aspx?Item=N82E16816101836
 [2]: http://www.newegg.com/Product/Product.aspx?Item=N82E16820239702
 [3]: http://www.newegg.com/Product/Product.aspx?Item=20-167-177
