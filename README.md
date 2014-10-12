@@ -27,11 +27,18 @@ To sum it up, I view "devstack" as reading a book about math.  You do not learn 
 * CentOS repository mirror on the utility nodes.\
 
 The first phase will implement 4 node OpenStack cloud consisting of:
-* 2 utility nodes 
+
 * 1 controller node
 * 1 network node
 * 2 compute nodes
+
+To support the environment there are:
+
+* 2 utility nodes 
 * 2 TP-Link L2 managed switches for redundancy.
+* 2 CyberPower OR1500 UPS
+
+All equipment is rack-mounted.
 
 2 additional nodes will be added later for controller and network node redundancy/peformance.
 
