@@ -78,7 +78,7 @@ Compute
 
 #### References
 
-- [1]: Troubleshooting in OpenStack Cloud Computing]
+- [Troubleshooting in OpenStack Cloud Computing][1]
 
 [1]: https://www.packtpub.com/books/content/troubleshooting-openstack-cloud-computing
 
