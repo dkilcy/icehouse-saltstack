@@ -1,7 +1,7 @@
 # Troubleshooting
 
 - Make sure all the clocks are in sync on all the nodes:  `ntpq -p`
-- Make sure qpidd is running on all the nodes:  `service qpidd status`
+- Make sure qpidd is running on the controller nodes:  `service qpidd status`
 - MySQL is running and responsive.  
 
 
