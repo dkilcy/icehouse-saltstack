@@ -4,7 +4,6 @@ Common
 ```
 service salt-minion status
 service iptables status
-
 service qpidd status
 ```
 
@@ -34,21 +33,6 @@ service openstack-nova-scheduler restart
 service openstack-nova-novncproxy restart
 service openstack-nova-conductor restart
 
-
-salt 'controller-01.mgmt' service.restart neutron-server
-
-salt 'controller-01.mgmt' service.restart openstack-keystone
-
-salt 'controller-01.mgmt' service.restart openstack-glance-api
-salt 'controller-01.mgmt' service.restart openstack-glance-registry
-
-salt 'controller-01.mgmt' service.restart openstack-nova-api
-salt 'controller-01.mgmt' service.restart openstack-nova-cert
-salt 'controller-01.mgmt' service.restart openstack-nova-consoleauth
-salt 'controller-01.mgmt' service.restart openstack-nova-scheduler
-salt 'controller-01.mgmt' service.restart openstack-nova-novncproxy
-salt 'controller-01.mgmt' service.restart openstack-nova-conductor
-
 ```
 
 Network
@@ -66,13 +50,6 @@ service neutron-l3-agent restart
 service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 service openvswitch restart
-
-salt 'network-01.mgmt' service.restart neutron-server
-salt 'network-01.mgmt' service.restart neutron-openvswitch-agent
-salt 'network-01.mgmt' service.restart neutron-l3-agent
-salt 'network-01.mgmt' service.restart neutron-dhcp-agent
-salt 'network-01.mgmt' service.restart neutron-metadata-agent
-salt 'network-01.mgmt' service.restart openvswitch
 
 ```
 Compute
@@ -94,17 +71,7 @@ service neutron-dhcp-agent restart
 service neutron-metadata-agent restart
 service openvswitch restart
 service openstack-nova-compute restart
-
-salt 'compute-01.mgmt' service.restart libvirtd
-salt 'compute-01.mgmt' service.restart neutron-server
-salt 'compute-01.mgmt' service.restart neutron-openvswitch-agent
-salt 'compute-01.mgmt' service.restart neutron-l3-agent
-salt 'compute-01.mgmt' service.restart neutron-dhcp-agent
-salt 'compute-01.mgmt' service.restart neutron-metadata-agent
-salt 'compute-01.mgmt' service.restart openvswitch
-salt 'compute-01.mgmt' service.restart openstack-nova-compute
 ```
-
 
 # Logs and /etc files
 
