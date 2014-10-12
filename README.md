@@ -38,7 +38,7 @@ To support the environment there are:
 * 2 TP-Link L2 managed switches for redundancy.
 * 2 CyberPower OR1500 UPS
 
-All equipment is rack-mounted.
+With the exception of the utility nodes, all equipment is rack-mounted.
 
 2 additional nodes will be added later for controller and network node redundancy/peformance.
 
@@ -140,7 +140,6 @@ network-01     | 10.0.0.21     | External       | 10.0.1.21      |              
 compute-01     | 10.0.0.31     |                | 10.0.1.31      |                |                |
 compute-02     | 10.0.0.32     |                | 10.0.1.32      |                |                |
 
-#### Hardware References:
 
 [1]: http://www.newegg.com/Product/Product.aspx?Item=N82E16816101836
 [2]: http://www.newegg.com/Product/Product.aspx?Item=N82E16820239702
