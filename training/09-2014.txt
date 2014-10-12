@@ -1,0 +1,1570 @@
+Day 1
+-----
+Salt Cloud
+
+# cd /etc/salt
+# mkdir cloud.providers.d
+# vi /etc/salt/cloud.providers.d/ec2.conf
+
+amazon:
+  id: AKIAJEMOQIZQIJFS4QUQ
+  key: FBSzQJn6O+SD7n/6gosJdb2g/EzDGMyg+Xo0AZlC
+  private_key: /etc/salt/dc201409.pem
+  keyname: dc201409
+  provider: ec2
+
+# salt-cloud --list-locations amazon
+[INFO    ] salt-cloud starting
+amazon:
+    ----------
+    ec2:
+        ----------
+        ap-northeast-1:
+            ----------
+            endpoint:
+                ec2.ap-northeast-1.amazonaws.com
+            name:
+                ap-northeast-1
+
+# cd /etc/salt
+# mkdir cloud.profiles.d
+# cd cloud.profiles.d
+# vi amazon.conf
+
+amazon-linux:
+  provider: amazon
+  location: us-east-1
+  image: ami-7c807d14
+  size: t1.micro
+
+  minion:
+    master: 10.111.151.160
+
+# salt-cloud -p amazon-linux dkilcy01
+
+[INFO    ] salt-cloud starting
+[INFO    ] Creating Cloud VM dkilcy01 in us-east-1
+[INFO    ] Created node dkilcy01
+[INFO    ] Salt node data. Public_ip: 50.16.88.184
+...
+
+# salt-cloud -Q | less
+# salt '*' test.ping
+# salt '*' test.arg hello
+
+Targeting
+
+nodegroups: (gives a compound command a name)
+  sethminion: 'seth* and G@os.family:RedHat'
+
+# salt -N sethminion test.ping
+
+# salt -G 'os_family:RedHat' test.ping
+
+Grains
+
+# salt dkilcy-minion grains.items
+# salt dkilcy-minion grains.get ps
+# salt dkilcy-minion grains.setval roles '[web, caching]'
+# salt -G 'roles:web' test.ping
+# salt -G 'roles:web' cmd.run 'cat /etc/salt/grains'
+
+Can put the grains in the cloud profile
+
+# salt '*' pkg.list_pkgs
+
+Module documentation, stored in the module
+# salt '*' sys.doc | less
+
+# salt '*' sys.doc test.ping
+# salt '*' sys.list_modules
+
+# man 7 salt
+
+Ugrade the master first, before minions.   Newer master can talk to older minions
+
+# salt-call -l debug pkg.list_pkgs
+
+# salt '*' network.ip_addrs
+
+# salt '*' test.versions_report
+# salt '*' test.versions_report --out=json
+
+minions connect to master on ports 4505 and 4506
+zeromq
+master sends out publish to everyone and minions do work
+salt always sends out a broadcast to all minions.
+minion determines if it matches them and runs the function
+1st port publish/subscribe
+2nd port is the comm channel
+dont use sensitive data on the CLI, use the pillar
+salt is asynchronous
+# salt '*' test.versions_report --out=json
+Executed command with job ID: 20140903182834019263
+
+salt-run jobs.list_jobs
+/var/cache/salt/master/jobs
+
+# salt-run jobs.lookup_jid 20140903182834019263
+
+# salt '*' network.interfaces --async
+
+# salt --verbose '*' test.sleep 60
+Executing job with jid 20140903183711604105
+-------------------------------------------
+
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+Execution is still running on dkilcy01
+Execution is still running on dkilcy-minion
+dkilcy01:
+    True
+dkilcy-minion:
+    True
+
+# salt --async '*' test.sleep 60
+Executed command with job ID: 20140903184048411967
+[root@ip-10-111-151-160 ~]# salt '*' saltutil.running
+dkilcy01:
+    ----------
+    - arg:
+        - 60
+    - fun:
+        test.sleep
+    - jid:
+        20140903184048411967
+    - pid:
+        18105
+    - ret:
+        
+    - tgt:
+        *
+    - tgt_type:
+        glob
+    - user:
+        sudo_ec2-user
+dkilcy-minion:
+    ----------
+    - arg:
+        - 60
+    - fun:
+        test.sleep
+    - jid:
+        20140903184048411967
+    - pid:
+        19086
+    - ret:
+        
+    - tgt:
+        *
+    - tgt_type:
+        glob
+    - user:
+        sudo_ec2-user
+[root@ip-10-111-151-160 ~]#
+
+Runner Modules
+/var/cache/salt/minion/proc - contains the job id currently running
+results cached for 24 hours
+
+job cache
+
+Lab 3
+======
+  194  salt \* grains.item os
+  195  salt \* grains.items
+  196  salt \* network.interfaces
+  197  salt \* network.subnets
+  198  salt \* pkg.list_pkgs
+  199  salt \* service.get_enabled
+  200  salt \* service.get_all
+  201  salt \* service.status sshd
+  202  salt \* cron.list_tab root
+  203  salt \* disk.usage
+  204  salt \* grub.conf
+  205  salt \* kmod.lsmod
+  206  salt \* pkg.install httpd
+  207  salt \* service.start httpd
+
+
+state compiler
+module types and where to look up modules
+salt module index
+
+Returners
+Return data can be redirected anywhere
+(Carbon)
+Redis is fast and good spot to store results
+configured in master or minion config
+# salt '*' test.ping --ret=smtp_return
+
+smtp.from: 'foo@foo.com'
+smtp.to: 'bar@foo.com'
+smtp.host: localhost
+smtp.port: 102
+smtp.subject: "Hello from Salt"
+
+python -m smtpd -n -c DebuggingServer localhost:1025
+
+Runners
+Do this, then do that...
+How to automate 
+# salt-run cache.grains
+# salt-run manage.status
+
+# salt-run manage.present
+
+#looks at tcp table on master
+/etc/salt/master
+presence: True 
+
+Salt orchestration system 
+- ex: dont start appl servers until DB servers are up
+
+runners.state - orchestrate across minions timing dependent
+used to be something called 'overstate'.  state.orchestate replaces.  Uses state system
+state.sls 
+
+http://docs.saltstack.com/en/latest/topics/tutorials/states_pt5.html#the-orchestrate-runner
+
+salt running masterless
+salt-call --local service.enable salt-master
+
+******salt proxy manage where you cant install a minion daemon on.  anything that has an api
+no slides its new
+
+peer communications - minions can share data with other minions
+
+returner - 
+salt mine - 
+peer system - 
+
+Peer
+=====
+allows 1 minion to exec on the other.  run cmd and return result right now. 
+goes thru the master. whitelist on master.
+/etc/salt/master
+#Peer Publish settings
+peer: 
+  'G@roles:build':
+    - myutil.frplou.spp
+
+  'dkilcy*':
+    - network.ip_addrs
+
+"publish.publish"# salt-call publish.publish '*' network.ip_addrs
+
+# salt-call publish.publish '*' network.ip_addrs
+
+salt.modules.publish
+
+************************************************************************
+
+Salt Mine
+=========
+
+mine_functions:
+  network.ip_addrs: []
+
+mine_interval: 3
+
+# salt 'dkilcy-minion' mine.get '*' network.ip_addrs
+dkilcy-minion:
+    ----------
+    dkilcy-minion:
+        - 10.111.151.160
+
+different ways to share data between minions:
+Salt mine intended for info sharing - gets data on schedule and stores on master
+Peer - exec functions on a minion from another minion.   Runner module on master
+Reactor system - can be used to initiate commands on another system.  Fire event on minion to tell the master then master tells minion.
+ 
+************************************************************************
+
+Day 2
+=====
+salt-cloud -Q
+
+compund command is a way to call multiple modules in a single exec
+
+import salt.client
+local = salt.client.localClient()
+local.cmd('*', 'test.ping', [] )
+local.cmd('*', ['test.ping', 'cmd.run'], [[], ['uptime']))
+
+Runner types that can coordinate groups of minions like orchestrate
+
+Salt SSH
+Run without salt minion but needs SSH agent
+Normally tell minion where to tell where master
+Tell 'main machine' going to be sshing to via a roster file.
+uses the 'thin' runner module. command and host to ssh to.
+package up any files it needs including salt.  runner generates tiny tarball which is salt.
+Contains salt and some dependencies and state files to run on the minion.  unpacks in /tmp and
+executes in tmp.  leaves tarball in place so it doesnt have to deploy initial payload
+can generate tarball itself using thin runner.  Way to run salt without daemons.
+--max-procs=25 by default
+
+Salt States
+------------
+tom likes to think of managing systems in flow and state.
+Flow is a one off, current state, run pkg right now, test.ping, right now,....one-offs
+State is wrapping that flow in before and after steps
+- run a cmd to bring a system to a state and leave it there.
+state modules wrap execution modules
+state systems calls state modules. very important to keep both modules separated in your head.
+
+State modules are different than exec modules.  They have overlapping names.
+Ex: install apache
+Not totally related..
+state modules use the execution modules. 
+A state modue should do a pre-check, does anything need to be done?
+if not call out an exec module.  return what has changed.
+State modules should not do work just checks and report changes.  not all modules ahere to this philosophy
+Almost always wrapping exec modules.
+
+ex: file.managed top hit for doc site.  workhorse.
+file.managed calls many exec modules as it does it checks. 
+i.e 1st- does file exist?
+http://docs.saltstack.com/en/latest/ref/modules/all/salt.modules.file.html#module-salt.modules.file
+
+salt 'dkilcy01' file.file_exists /etc/passwd
+
+exec modules under m
+state under s
+
+pkg.install   - exec module
+pkg.installed - state module
+
+# salt 'dkilcy01' pkg.install httpd
+^^ doesnt care if apache is already installed, install it
+(execution module)
+
+[root@ip-10-111-151-160 salt]# cat apache.sls 
+apache:
+  pkg.installed: 
+    - name: httpd
+[root@ip-10-111-151-160 salt]# 
+^^^ do the check and get it into state if apache is not installed
+(state module)
+
+question
+execution
+result
+
+
+http://docs.saltstack.com/en/latest/ref/modules/all/salt.modules.useradd.html#module-salt.modules.useradd
+
+# salt-call -l debug user.add foo
+...
+
+http://docs.saltstack.com/en/latest/ref/modules/all/salt.modules.state.html#module-salt.modules.state
+
+
+# salt 'dkilcy01' state.sls apache
+                      ^^ internal path syntax. i.e a salt path
+                                  ^^ dont have to specify .sls
+
+dkilcy01:
+----------
+          ID: apache
+    Function: pkg.installed
+        Name: httpd
+      Result: True
+     Comment: Package httpd is already installed
+     Changes:   
+
+Summary
+------------
+Succeeded: 1
+Failed:    0
+------------
+Total:     1
+[root@ip-10-111-151-160 salt]# 
+
+There is execution order in a state file.
+'other tool' did not have deterministic ordering
+salt designed to always run in same order and fine grained control over it.
+
+http://docs.saltstack.com/en/latest/ref/states/all/salt.states.service.html#module-salt.states.service
+apache:
+  pkg.installed:
+    - name: httpd
+
+ensure_apache_enabled_on_boot:
+  service.enabled:
+    - name: httpd
+
+apache_service:
+  service.running:
+    - name: httpd
+    - enable: True
+
+exec are always under salt.m
+state are always under salt.s
+
+id:
+  function:
+    - arguments
+
+-----------------------------------------------------------
+apache:
+  pkg.installed:
+    - name: httpd
+
+apache_service:
+  service.running:
+    - name: httpd
+    - enable: True
+
+foo:
+  user.present:
+    - name: foo
+
+mod_status:
+  file.managed:
+    - name: /etc/httpd/conf.d/mod_status.conf
+    - contents: |
+        <Location /server-status>
+          SetHandler server-status
+          Order allow
+        <Location>
+
+-----------------------------------------------------------------
+# salt 'dkilcy01' state.sls apache
+
+pipe symbol designates a multiline string
+file.append, file.replace are functions in the module
+
+how do i do x with salt? first how do i do it without salt.....
+Setup a foo user
+
+
+# salt 'dkilcy01' state.sls apache
+workflow:
+- salt sends out broadcast to everybody
+- do i match the target? yes or no.  If yes execute state.sls module
+looks in its file cache from master to see if it has apache.sls
+it does not first time we run, so it asks salt file server for that file
+hits master, give me apache.sls to minion and caches locally
+takes file and runs thru the yaml parser and builds a json data structure (python data structutre)
+...havent done anything yet...
+runs thru salt state compiler and go thru the state file going in order asked to run
+
+job is to build the data structure to give to salt 
+think of writing states as writing a data structure...run thru a yaml parser to verify syntax
+*think about this calling functions you will get tripped up
+- sequence of the states respects order
+basically have 1 giant sls file to bottom, but not reuseable across use cases
+basically just a giant shell script
+best practice is to use modular states....
+
+salt renderer system
+----------------------
+pluggable interface
+http://docs.saltstack.com/en/latest/salt-modindex.html#cap-r
+
+salt doesnt care how the data structure is built. if its in a format it can understand.
+Default is jinja and yaml
+can write straight python
+http://docs.saltstack.com/en/latest/ref/renderers/all/salt.renderers.py.html#module-salt.renderers.py
+
+#!jinja|yaml
+
+ordering across sls files can be a nightmare
+salt states ordered deterministically
+salt gives tools to define the order: "require" requesite allows build a real dependency tree
+(github salt-state-graph)
+"require" is not a function argument
+unique across entire state tree
+under an id, can only call the **same** module once.
+
+do not put sensitive data into the sls files.    any minion can download it. put in Pillar
+smaller sls files are better
+salt is push or pull
+how salt keeps track of whats running
+it keeps a dictionary, as each fctn is exec the result is put in a dict
+to see if its run, it does a dict lookup. if its not there then it runs it
+
+'watch statement - a requesite type - watches a state
+fctn same as 'require' stmt plus addl functionality
+
+if a module has mod_watch then you can use a watch statement in a service state
+
+have to add own precheck when using cmd.run state
+do something like unless: test -f 
+
+data structure generated and how to glue sls together with top files
+look at the different data structures
+
+include:
+  - apache.one.two  <--- dirs relative to file_roots
+
+mod_status:
+  file.managed:
+    - name: /etc/httpd/conf.d/mod_status.conf
+    - contents: |
+        <Location /server-status>
+          SetHandler server-status
+          Order allow
+        <Location>
+    - require:
+      - sls: apache   <------- dont do anything until everything in apache.sls is executed (instead of pkg)
+    - watch_in:
+      - service: apache_service
+
+
+
+[root@ip-10-111-151-160 salt]# salt '*' state.show_sls apache --out=json
+/usr/lib64/python2.6/site-packages/Crypto/Util/number.py:57: PowmInsecureWarning: Not using mpz_powm_sec.  You should rebuild using libgmp >= 5 to avoid timing attack vulnerability.
+  _warn("Not using mpz_powm_sec.  You should rebuild using libgmp >= 5 to avoid timing attack vulnerability.", PowmInsecureWarning)
+/usr/lib64/python2.6/site-packages/Crypto/Util/randpool.py:40: RandomPool_DeprecationWarning: This application uses RandomPool, which is BROKEN in older releases.  See http://www.pycrypto.org/randpool-broken
+  RandomPool_DeprecationWarning)
+{
+    "dkilcy01": {
+        "apache": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "pkg": [
+                {
+                    "pkgs": [
+                        "httpd", 
+                        "php"
+                    ]
+                }, 
+                "installed", 
+                {
+                    "order": 10000
+                }
+            ]
+        }, 
+        "apache_service": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "service": [
+                {
+                    "name": "httpd"
+                }, 
+                {
+                    "enable": true
+                }, 
+                "running", 
+                {
+                    "order": 10001
+                }
+            ]
+        }
+    }
+}
+{
+    "dkilcy-minion": {
+        "apache": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "pkg": [
+                {
+                    "pkgs": [
+                        "httpd", 
+                        "php"
+                    ]
+                }, 
+                "installed", 
+                {
+                    "order": 10000
+                }
+            ]
+        }, 
+        "apache_service": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "service": [
+                {
+                    "name": "httpd"
+                }, 
+                {
+                    "enable": true
+                }, 
+                "running", 
+                {
+                    "order": 10001
+                }
+            ]
+        }
+    }
+}
+[root@ip-10-111-151-160 salt]# 
+
+
+********* NEW FORMAT *****************
+apache_service:
+  service.running:
+    - name: httpd
+    - enable: True 
+
+********* OLD FORMAT - DONT DO THIS **********
+apache_service:
+  service:
+    - running
+    - name: httpd
+    - enable: True
+
+salt '*' state.show_sls apache --out=json
+
+high state
+"order" is how salt keep things in order.
+
+
+{
+    "dkilcy01": {
+        "apache": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "pkg": [
+                {
+                    "pkgs": [
+                        "httpd", 
+                        "php"
+                    ]
+                }, 
+                "installed", 
+                {
+                    "order": 10000
+                }
+            ]
+        }, 
+        "apache_service": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "service": [
+                {
+                    "name": "httpd"
+                }, 
+                {
+                    "enable": true
+                }, 
+                "running", 
+                {
+                    "order": 10001
+                }
+            ]
+        }
+    }
+}
+{
+    "dkilcy-minion": {
+        "apache": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "pkg": [
+                {
+                    "pkgs": [
+                        "httpd", 
+                        "php"
+                    ]
+                }, 
+                "installed", 
+                {
+                    "order": 10000
+                }
+            ]
+        }, 
+        "apache_service": {
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "service": [
+                {
+                    "name": "httpd"
+                }, 
+                {
+                    "enable": true
+                }, 
+                "running", 
+                {
+                    "order": 10001
+                }
+            ]
+        }
+    }
+}
+
+takes this high state and translate it to a low state
+
+# salt '*' state.show_low_sls apache --out=json
+{
+    "dkilcy01": [
+        {
+            "enable": true, 
+            "name": "httpd", 
+            "state": "service", 
+            "__id__": "apache_service", 
+            "fun": "running", 
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "order": 10000
+        }
+    ]
+}
+{
+    "dkilcy-minion": [
+        {
+            "enable": true, 
+            "name": "httpd", 
+            "state": "service", 
+            "__id__": "apache_service", 
+            "fun": "running", 
+            "__env__": "base", 
+            "__sls__": "apache", 
+            "order": 10000
+        }
+    ]
+}
+[root@ip-10-111-151-160 salt]# 
+ordered list of dictionaries
+know exactly what the state system is doing
+
+jinja is used to generate yaml
+low state is alist of dictionaries
+
+# salt '*' state.show_sls apache test=True
+if run in test=true and --out=json, output of state is running dictionary
+
+# salt '*' state.sls apache test=True --out=json
+{
+    "dkilcy01": {
+        "service_|-apache_service_|-httpd_|-running": {
+            "comment": "The named service httpd is not available", 
+            "__run_num__": 0, 
+            "changes": {}, 
+            "name": "httpd", 
+            "result": false
+        }
+    }
+}
+{
+    "dkilcy-minion": {
+        "service_|-apache_service_|-httpd_|-running": {
+            "comment": "The named service httpd is not available", 
+            "__run_num__": 0, 
+            "changes": {}, 
+            "name": "httpd", 
+            "result": false
+        }
+    }
+}
+
+# salt --verbose '*' state.sls apache test=True --out=json    <------ verbose to get the job id
+# salt-run jobs.lookup_jid 20140904184616352635
+# salt-run jobs.list_jobs
+
+low state vs high state: low is machine friendly
+
+glueing together dictionaries :
+- using include
+- comma separated # salt '*' state.show_sls apache,apache_mod_status
+- top file (p83)
+
+state.highstate execution module 
+top.sls:
+- put in additional target info.  ex: base
+base:
+  '*':
+    - apache
+    - apache_mod_status
+
+/etc/salt/master:
+
+file_root:
+  base:
+    - /srv/salt
+  prod:
+    - /srv/salt_prod
+
+can do above, but not the best way
+only 1 top file in base env
+# salt '*' grains.get roles
+dkilcy01:
+    
+dkilcy-minion:
+    - web
+    - caching
+
+base:
+  'roles:web':
+    - match: grain
+    - apache
+    - apache_mod_status
+  'roles:db':
+    - match: grain
+    - postgres
+
+state.highstate execute everything in the top.sls file.  setup entire infra in one step
+use highstate to run on timer, enforce state on infrastructure
+run test=True to see if anything changed, and not actually change anything
+can use returners that look for changes and emails them 
+
+do one-offs when needed or setup entire infra when needed 
+
+state.top top
+same as running top.sls
+
+salt '*' state.top 
+- put all the environments in the single top.sls file.
+
+progomatically generate a top.sls file
+# salt 'dkilcy01' grains.setval roles '[db]'
+dkilcy01:
+  roles:
+      db
+[root@ip-10-111-151-160 salt]# cat top.sls
+base:
+  'roles:web':
+    - match: grain
+    - apache
+    - apache_mod_status
+  'roles:db':
+    - postgres
+
+[root@ip-10-111-151-160 salt]# salt '*' state.highstate
+dkilcy-minion:
+----------
+          ID: mod_status
+    Function: file.managed
+        Name: /etc/httpd/conf.d/mod_status.conf
+      Result: False
+     Comment: The following requisites were not found:
+                                 require:
+                                     pkg: apache
+     Changes:   
+----------
+          ID: apache_service
+    Function: service.running
+        Name: httpd
+      Result: False
+     Comment: One or more requisite failed
+     Changes:   
+
+Summary
+------------
+Succeeded: 0
+Failed:    2
+------------
+Total:     2
+dkilcy01:
+----------
+          ID: postgres
+    Function: pkg.installed
+        Name: postgresql
+      Result: True
+     Comment: The following packages were installed/updated: postgresql.
+     Changes:   
+              ----------
+              postgresql:
+                  ----------
+                  new:
+                      9.2-1.20.amzn1
+                  old:
+                      
+              postgresql9:
+                  ----------
+                  new:
+                      9.2.9-1.42.amzn1
+                  old:
+                      
+              postgresql9-libs:
+                  ----------
+                  new:
+                      9.2.9-1.42.amzn1
+                  old:
+                      
+
+Summary
+------------
+Succeeded: 1
+Failed:    0
+------------
+Total:     1
+
+----------------------
+
+the top file matches everything, including multiple environments.
+can harcode the env in minion config
+
+
+base:
+  '*':
+    - base_config      		<-- .sls      
+  'roles:web':
+    - match: grain
+    - apache			<-- .sls 
+    - apache_mod_status 	<-- .sls 
+  'dkilcy01':
+    - postgres			<-- .sls 	
+
+
+Pillar
+======
+minion-specific data - applies only to the minion or should only see the private data
+pillar uses the same salt system instead of calling fctns we build data structure
+MUST use a top file with pillar
+
+mkdir -p /srv/pillar
+vi top.sls
+
+base:
+  '*':
+    - common
+  'dkilcy01':
+    - dkilcy01
+  'dkilcy02':
+    - dkilcy02
+#  'os_family:RedHat':
+   'G@os_family:RedHat':
+    - match: compound
+#    - match: grain
+    - centos_infos
+
+
+vi common.sls
+motd: "Welcome to ACME Corp. You are being monitored"
+
+make a dictionary
+
+****** pillar is not for distributing files, its for dictionaries 
+
+[root@ip-10-111-151-160 pillar]# salt '*' saltutil.refresh_pillar
+dkilcy01:
+    None
+dkilcy-minion:
+    None
+
+- run refresh pillar func. 
+- contact the master and ask for the pillar
+- master will parse the yaml file and match the minion, for each matching grab files and generate
+dictionary.
+- dict shipped over the wire , kept in memory
+
+http://docs.saltstack.com/en/latest/ref/modules/all/salt.modules.pillar.html#module-salt.modules.pillar
+
+# salt '*' pillar.items
+# salt '*' pillar.items motd
+
+master config is included in the minions pillar.
+can be turned off
+
+formulas are just a collection of states
+add pillar dirs to file_roots
+
+
+
+state.sls memcached 
+or 
+adding to top sls 
+or 
+include memcached
+...... all the same
+
+
+# salt dkilcy01 pillar.get ssh.priv_key
+dkilcy01:
+    --- blah ---
+    dsdsadfsdafdsfsdfdsfds
+    --- blah ---
+    
+
+# vi /srv/salt/priv_key.sls
+install_deployment_priv_key:
+  file.managed:
+    - name: /tmp/authorized_keys
+    - contents_pillar: ssh.priv_key
+    - mkdirs: True
+    - dir_mode: 777
+    - mode: 644
+    - user: root
+    - group: root
+
+http://docs.saltstack.com/en/latest/ref/states/all/salt.states.file.html#salt.states.file.managed
+
+# salt dkilcy01 state.sls priv_key
+dkilcy01:
+----------
+          ID: install_deployment_priv_key
+    Function: file.managed
+        Name: /tmp/authorized_keys
+      Result: True
+     Comment: File /tmp/authorized_keys updated
+     Changes:   
+              ----------
+              diff:
+                  New file
+              mode:
+                  0644
+
+Summary
+------------
+Succeeded: 1
+Failed:    0
+------------
+Total:     1
+
+
+set_the_motd:
+  file.managed:
+    - name: /etc/motd
+    - source: salt://motd.txt
+    - template: jinja      <--- runs thru jinja before writing
+
+[root@ip-10-111-151-160 salt]# salt dkilcy01 state.sls motd
+
+dkilcy01:
+----------
+          ID: set_the_motd
+    Function: file.managed
+        Name: /etc/motd
+      Result: True
+     Comment: File /etc/motd updated
+     Changes:   
+              ----------
+              diff:
+                  ---  
+                  +++  
+                  @@ -1,8 +1,4 @@
+                   
+                  -       __|  __|_  )
+                  -       _|  (     /   Amazon Linux AMI
+                  -      ___|\___|___|
+                  +the message of the day is:
+                   
+                  -https://aws.amazon.com/amazon-linux-ami/2014.03-release-notes/
+                  -11 package(s) needed for security, out of 32 available
+                  -Run "sudo yum update" to apply all updates.
+                  +Welcome to ACME Corp. You are being monitored
+                  
+
+Summary
+------------
+Succeeded: 1
+Failed:    0
+------------
+Total:     1
+
+
+
+salt fileserver
+fileserver goes over zeromq bus, pulls out of file_roots
+does checksum, chunk transfers
+good for salt stuff not everything
+
+
+Day 3
+=====
+pillar provides minion specific data.  useful for platform specific.  matching in the top.sls file.
+"all my RH systems get these package names..."
+use returners and outputters to get data out...
+External pillar is how you get data INTO salt
+salt.pillar modules p135 example
+
+1. low level
+2. given this existing thing (ex chef) we can work with that useful for grabbing data out of existing sources
+
+
+Client ACL
+----------
+/etc/salt/master
+
+client_acl:
+  larry:                <-- linux user
+    - test.ping
+    - network.*
+
+client_acl_blacklist:
+  users:
+    - root
+  modules:
+    - cmd
+
+external auth:
+  pam:
+    fred:
+      - test.*
+
+
+salt.auth to authenticate against an external user
+
+Salt API
+another module type
+rundec - java
+
+
+salt reactor/event bus
+
+saltstack-formulas/ec2-autoscale-reactor
+
+
+External Job Cache - default returner. keeps job cache off the master
+Salt File Server - async, chunking, checksum, gzip 
+Salt Wheel
+External Auth
+
+Salt Topologies
+---------------
+syndic is a name for middleman - a dumb pass thru interface for events and commands
+does not enforce sync, can be used for logical separation
+from the master commands are transparent they go thru the syndic
+run each datacenter independently
+useful for scaling
+20k minions 
+10k here, 10k here, 2 returns to master
+events bubble up from syndic to master master
+good for logical divison
+
+Master-Master
+-------------
+an addition for HA purposes.  2 hot masters. 
+install master daemon on separate servers, private keys needs to be the same
+keep in sync by calling a minion on the other master
+up to user to keep in sync
+minions connect to both master simultaneously
+
+vi /etc/salt/minion
+# tell mionion where master is
+
+master:
+  - salt1
+  - salt2
+
+
+Standalone Minion
+------------------
+salt-call --local  # cli field clobbers minion config
+or
+file_client: local
+in minion config
+
+minion swarm for testing
+good way to test master
+
+Event System
+------------
+
+-------------------------------------
+Full module list - why you might want to run modules
+
+(imbed python into yaml - salt mailing list last week its own github repository)
+yamlscript
+
+Module List
+Loader system - modules otpionally loaded depending on grains etc...all salt modules use this
+ex: mysql module
+__virtualname__
+
+# salt '*' sys.list_modules
+# salt '*' pkg.install git
+# salt '*' sys.reload_modules
+
+Write an execution module:
+runner module
+some run on minion, master, etc..When writing module, need to know where its going to be run
+if you run on master, need to put in specific place
+vi /etc/salt/master
+extension_modules: /srv/modules
+once directory is defined 
+mkdir -p /srv/modules/{runners,wheel,auth,pillar}
+put python files and restart master (anytime config file is edited)
+
+vi /srv/modules/runners/myco.py
+[root@ip-10-111-151-160 runners]# cat myco.py 
+def dostuff():
+    ret = 'stuff has been done'
+    print ret
+    return ret
+
+salt-run myco.dostuff
+
+Runner modules get loaded on master.  defined the setting in master config
+jump to p150
+
+
+modules follow python convention by prefixing with __  (dunderscore)
+
+execution modules that get distributed
+custom modules and distribution
+mkdir /srv/salt/_modules /srv/salt/_grains   
+
+[root@ip-10-111-151-160 salt]# mkdir /srv/salt/_modules /srv/salt/_grains   
+[root@ip-10-111-151-160 salt]# vi /srv/salt/_modules/myutil.py
+[root@ip-10-111-151-160 salt]# cat _modules/myutil.py 
+import datetime
+
+
+def getdate():
+    '''
+    show current date and time for this sys
+    '''
+    return str( datetime.datetime.now() )
+
+def beancounter_report():
+    '''
+    show boring accounting data
+    '''
+    list_of_ips = __salt__['network.ip_addrs']()
+    currently_assigned_roles = __grains__['roles']
+
+    return {
+        'ipaddrs': list_of_ips,
+        'current_roles' : currently_assigned_roles,
+    }
+
+[root@ip-10-111-151-160 salt]# salt '*' saltutil.sync_modules
+dkilcy01:
+    - modules.myutil
+# salt '*' saltutil.sync_modules
+dkilcy01:
+dkilcy-minion:
+[root@ip-10-111-151-160 salt]# salt '*' myutil.getdate
+dkilcy01:
+    2014-09-05 15:22:22.641806
+dkilcy-minion:
+    2014-09-05 15:22:22.645373
+
+add a comment for documentation
+resync
+
+# salt '*' sys.doc myutil
+myutil.getdate:
+
+    show current date and time for this sys
+
+can do same with state modules.
+state modules do pre and post check
+http://docs.saltstack.com/en/latest/ref/states/writing.html
+
+
+exec modules are completely free form, take as many args as possible
+function must take a parameter called 'name'
+common convention to put dictionary at top with seed values and change as appropriate
+ret = {'name': name, 'changes': {}, 'result': False, 'comment': ''}
+raise custom exceptions
+
+https://github.com/saltstack/salt/blob/develop/tests/saltsh.py
+
+
+salt loader sees python file
+lloks for virtual function...if not , just load it otherwise exec
+part of loading is takes dict and injects it into the function
+
+# salt '*'  myutil.beancounter_report
+dkilcy-minion:
+    ----------
+    current_roles:
+        - web
+        - caching
+    ipaddrs:
+        - 10.111.151.160
+dkilcy01:
+    ----------
+    current_roles:
+        - db
+    ipaddrs:
+        - 10.238.185.190
+[root@ip-10-111-151-160 _modules]# 
+
+dicts
+-------
+__salt__
+__grains__
+__opts__   - config file put in one big global dict
+__env__     - environment 
+__pillar__  
+(sls)
+test=True mode - an argument to state.highstate - way it works is it just sets the test var in opts
+
+if __opts__['test'] == True:
+    ...
+    ret['result'] = None
+    return ret
+
+Events
+=======
+salt event bus - on both min and mas.  min send events to master
+way it works, when minion send event to master on two-way channel.  
+master has its own event bus
+https://github.com/saltstack/salt/blob/develop/tests/eventlisten.py
+
+salt events have tags and data. slashes to namespace the event
+to listen to events of certain types
+http://docs.saltstack.com/en/latest/topics/event/index.html
+
+Reactor
+=======
+salt.runners.state - 
+
+http://docs.saltstack.com/en/latest/ref/runners/all/salt.runners.state.html#module-salt.runners.state
+
+# mkdir -p /srv/salt/reactor
+
+vi /etc/salt/master
+reactor:
+  - '/salt/auth':
+    - /srv/salt/reactor/auto_accept.sls
+
+reactor can call different types of modules 
+
+# vi auto_accept.sls
+auto_accept_minion_keys:
+  wheel.key.accept:
+    - match: {{ data['id'] }}             <--- kwarg
+
+^^ use this to call another function
+
+# salt '*' state.sls pycrypto
+
+States
+======
+p101
+
+state.highstate
+     .sls
+state.show_highstate   <- datastructure
+     .show_sls
+state.show_lowstate
+     .show_low_sls   
+
+include glues files together
+
+
+cd /srv/salt
+
+# salt dkilcy01 cp.cache_file salt://apache.sls
+# salt dkilcy01 cp.list_master
+
+[root@ip-10-111-151-160 salt]# salt dkilcy01 cp.list_master
+dkilcy01:
+    - _modules/myutil.py
+    - apache.sls
+    - apache_mod_status.sls
+    - debian_vhost.sls
+    - motd.sls
+    - motd.txt
+    - postgres.sls
+    - priv_key.sls
+    - pycrypto.sls
+    - reactor/auto_accept.sls
+    - top.sls
+[root@ip-10-111-151-160 salt]# salt dkilcy01 cp.list_states
+dkilcy01:
+    - apache
+    - apache_mod_status
+    - debian_vhost
+    - motd
+    - postgres
+    - priv_key
+    - pycrypto
+    - reactor.auto_accept
+    - top
+[root@ip-10-111-151-160 salt]# 
+
+include:
+  - apache.mod_status
+
+
+[root@ip-10-111-151-160 apache]# cd vhosts
+[root@ip-10-111-151-160 vhosts]# vi example_com.sls
+
+example_com:
+  file.managed:
+    - name: /etc/httpd/conf.d/example_com.conf
+    - require:
+      - file: mod_status
+
+Requesites
+----------
+manage the order
+
+# vi upgrade_kernel.sls
+
+upgrade_the_kernel_system:
+  pkg.latest:
+    - name: kernel
+
+reboot_to_switch_to_new_kernel:
+  cmd.wait: 
+    - name: system.reboot  #shutdown -r now
+    - order: last
+    - watch:
+      - pkg: upgrade_the_system_kernel
+
+
+here we call exec module from state module.
+http://docs.saltstack.com/en/latest/ref/states/all/salt.states.module.html#module-salt.states.module
+
+use requesites to specify order
+
+------------------------------------------------------------
+
+[root@ip-10-111-151-160 salt]# cat users.sls 
+
+install_common_users:
+  user.present: 
+    - name: 
+      - larry
+      - curly
+      - moe
+    - shell: /bin/bash
+
+# salt '*' state.show_sls users --out=json
+# salt '*' state.show_low_sls users --out=json
+
+prereq
+======
+
+apache:
+  pkg.installed:
+    - pkgs:
+      - httpd
+      - php
+
+apache_service:
+  service.running:
+    - name: httpd
+    - enable: True
+
+myapp:
+  git.latest:
+    - name: git@github.com/myco/myapp.git
+    - target: /var/www/myapp
+    - watch_in:
+      - service: apache_service
+
+drain_apache:
+  module.run:
+    - name: service.stop
+    - m_name: httpd
+    - prereq:
+      - git: myapp
+
+providers
+=========
+force alternative mod to provide needed func
+
+Jinja
+=====
+templating language. separate from yaml   both are not aware of each other
+
+special jinja markers and render variables against markers
+
+JINJA('hello world')
+JINJA('hello {{ name }} ')
+JINJA('hello {{ name }} ', 
+
+
+generate yaml based on grains i.e redhat vs ubuntu 
+
+install_common_users:
+  user.present:
+    - name:
+      - larry
+      - curly
+      - moe
+    - shell: /bin/bash
+
+{% set users = [
+    'larry',
+    'curly',
+    'moe',
+] %}
+
+{% for user in users %}
+install_user_{{ user }}:
+  user.present:
+    - name: {{ user }}
+    - shell: /bin/bash
+{% endfor %}
+
+jinja best practices:
+
+{% if grains['os_family' == 'RedHat' %}
+{% set pkg_names = [ 'httpd'
+] %}
+{% if grains['os_family' == 'Debian' %}
+{% set pkg_names = [ 'apache2'
+] %}
+
+mywebstack:
+  pkg.installed:
+    - pkgs:
+      {% if grains['os_family' == 'RedHat' %}
+      - httpd
+      - memcached
+      - php
+      {% elif grains['os_family' == 'Debian' %}
+      - apache2
+      - memcached
+      - php
+      {% endif %}
+
+apache_service:
+  service.running:
+    
+http://docs.saltstack.com/en/latest/topics/development/conventions/formulas.html#writing-formulas
+
+filter_by defaults to the os_family grain
+
+{% set lookup_table = {
+    'Debian': {
+        'server': 'mysql-server',
+        'client': 'mysql-client',
+        'service': 'mysql',
+        'config': '/etc/mysql/my.cnf',
+        'python': 'python-mysqldb',
+    },
+    'RedHat': {
+        'server': 'mysql-server',
+        'client': 'mysql',
+        'service': 'mysqld',
+        'config': '/etc/my.cnf',
+        'python': 'MySQL-python',
+    },
+} %}
+
+{% set mysql = lookup_table[grains['os_family']] %}
+
+mysql_cfg_file:
+  file.managed:
+    - name: /etc/my.cnf
+    - source: salt://mysql/prod_my_cnf.tmpl
+
+-------------------------
+{% set lookup_table = {
+    'prod': {
+        'my_cnf': 'salt://mysql/prod_my_cnf.tmpl',
+
+    },
+    'dev': {
+        'my_cnf': 'alt://mysql/dev_my_cnf.tmpl',
+    },
+} %}
+
+{% set mysql = lookup_table[grains['environment']] %}
+
+mysql_cfg_file:
+  file.managed:
+    - name: /etc/my.cnf
+    - source: {{ mysql['my_cnf'] }}

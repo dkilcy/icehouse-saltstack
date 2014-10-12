@@ -1,0 +1,18 @@
+
+openstack:
+  METADATA_SECRET: 0cb2bb516881d71eff88
+  ADMIN_TOKEN: 016389abda0579b560c0
+  ADMIN_PASS: 94bcee677185fee9c0bf
+  DEMO_PASS: 6efd10a180784267be4c
+  KEYSTONE_DBPASS: 376ebc0ee6649544c178
+  GLANCE_DBPASS: 6d44ef12b707316851f2
+  GLANCE_PASS: d6b6ed7dac1e80c684e8
+  NOVA_DBPASS: efc32b404d4f285c1a5a
+  NOVA_PASS: a1b587dd687cff6a6dff
+  NEUTRON_DBPASS: f06432c2e047666d99e3
+  NEUTRON_PASS: b398f7d80d20b77e238c
+
+  controller: controller-01
+
+### TODO: Find a better way to do this
+  nova_admin_tenant_id: d340cfa973844af7883c6b9696475ec4
