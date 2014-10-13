@@ -201,9 +201,38 @@ neturon_network_conf_18:
     - parameter: use_namespaces
     - value: 'True'
 
+neturon_network_conf_19:
+  openstack_config.present:
+    - filename: /etc/neutron/dhcp_agent.ini
+    - section: DEFAULT
+    - parameter: verbose
+    - value: 'True'
+
+neturon_network_conf_20:
+  openstack_config.present:
+    - filename: /etc/neutron/dhcp_agent.ini
+    - section: DEFAULT
+    - parameter: dnsmasq_config_file
+    - value: /etc/neutron/dnsmasq-neutron.conf
 
 ###
-# Configure the metadata agent
+# 2. Tunneling protocols such as generic routing encapsulation (GRE) include additional packet headers that increase overhead and decrease space available for the payload or user data. Without knowledge of the virtual network infrastructure, instances attempt to send packets using the default Ethernet maximum transmission unit (MTU) of 1500 bytes. Internet protocol (IP) networks contain the path MTU discovery (PMTUD) mechanism to detect end-to-end MTU and adjust packet size accordingly. However, some operating systems and networks block or otherwise lack support for PMTUD causing performance degradation or connectivity failure.
+###
+
+/etc/neutron/dnsmasq-neutron.conf:
+  file.managed:
+    - name: /etc/neutron/dnsmasq-neutron.conf
+    - user: root 
+    - group: neutron
+    - mode: 640
+    - create: True
+    - contents: |
+        dhcp-option-force=26,1454
+
+# TODO: killall dnsmasq
+
+###
+# To configure the metadata agent
 ###
 
 neutron_metadata_agent_1:
@@ -262,8 +291,11 @@ neutron_metadata_agent_8:
     - parameter: verbose
     - value: 'True'
 
+# TODO: 2. On the controller node, configure Compute to use the metadata service:
+# TODO: 3. On the controller node, restart the Compute API service:
+
 ###
-# configure the Modular Layer 2 (ML2) plug-in and associated services
+# To configure the Modular Layer 2 (ML2) plug-in and associated services
 ###
 
 neutron_ml2_plugin_1:
@@ -293,6 +325,8 @@ neutron_ml2_plugin_4:
     - section: ml2_type_gre
     - parameter: tunnel_id_ranges
     - value: '1:1000'
+
+# TODO: add [ovs] to /etc/neutron/plugins/ml2/ml2_conf.ini
 
 neutron_ml2_plugin_5:
   openstack_config.present:
@@ -330,7 +364,7 @@ neutron_ml2_plugin_8:
     - value: 'True'
 
 ###
-# Configure the Open vSwitch (OVS) service
+# To configure the Open vSwitch (OVS) service
 ###
 
 ###

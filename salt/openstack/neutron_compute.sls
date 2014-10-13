@@ -155,6 +155,13 @@ compute_network_conf_13:
     - parameter: service_plugins
     - value: router
 
+compute_network_conf_14:
+  openstack_config.present:
+    - filename: /etc/neutron/neutron.conf
+    - section: DEFAULT
+    - parameter: verbose
+    - value: 'True'
+
 ###
 # configure the Modular Layer 2 (ML2) plug-in
 ###
@@ -186,6 +193,8 @@ compute_ml2_plugin_4:
     - section: ml2_type_gre
     - parameter: tunnel_id_ranges
     - value: '1:1000'
+
+# TODO: add [ovs] to /etc/neutron/plugins/ml2/ml2_conf.ini
 
 compute_ml2_plugin_5:
   openstack_config.present:
@@ -360,9 +369,7 @@ compute_replace_neutron_openvswitch_agent:
 # 2. Restart the Compute service:
 ###
 
-compute_nova_compute_restart:
-  service.restart:
-    - name: openstack-nova-compute
+# TODO: restart openstack-nova-compute
 
 ###
 # 3. Start the Open vSwitch (OVS) agent and configure it to start when the system boots:

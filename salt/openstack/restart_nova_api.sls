@@ -1,5 +1,3 @@
 
-restart_nova_api:
-  service.restart:
-    - name: openstack-nova-api
+#TODO: restart openstack-nova-api
 

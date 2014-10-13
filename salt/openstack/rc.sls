@@ -1,5 +1,12 @@
 {% set controller = pillar['openstack']['controller'] %}
 
+dir_setup:
+  file.directory:
+    - name: /home/devops/openstack
+    - user: devops
+    - group: devops
+    - mode: 775
+
 auth_setup:
   file.managed:
     - name: /home/devops/openstack/auth-openrc.sh

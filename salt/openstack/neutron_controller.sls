@@ -17,7 +17,7 @@
 {% set nova_pass = salt['pillar.get']('openstack:NOVA_PASS') %}
 {% set metadata_secret = salt['pillar.get']('openstack:METADATA_SECRET') %}
 
-### TODO: fix this
+# TODO: figure out a better way to assign the nova_admin_tenant_id
 {% set nova_admin_tenant_id = salt['pillar.get']('openstack:nova_admin_tenant_id') %}
 
 ###
@@ -480,15 +480,14 @@ openstack_neutron_server_enabled_on_boot:
 
 
 ###
-# Configure Compute to use the metadata service:
-##
+# TODO: On the controller node, configure Compute to use the metadata service:
 
 neutron_controller_metadata_1:
   openstack_config.present:
     - filename: /etc/nova/nova.conf
     - section: DEFAULT
     - parameter: service_neutron_metadata_proxy
-    - value: 'True'
+    - value: 'true'
 
 neutron_controller_metadata_2:
   openstack_config.present:
@@ -497,9 +496,5 @@ neutron_controller_metadata_2:
     - parameter: metadata_proxy_shared_secret
     - value: {{ metadata_secret }}
 
-#neutron_controller_restart_api:
-#  service.running:
-#    - name: openstack-nova-api
-#    - enable: True
-#    - restart: True
+# TODO: On the controller node, restart the Compute API service: openstack-nova-api
 

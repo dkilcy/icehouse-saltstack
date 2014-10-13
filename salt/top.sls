@@ -4,7 +4,7 @@ base:
     - vim
     - ipv6/disable
     - iptables/stop
-    - uptodate
+#    - uptodate
 
   'roles:workstation':
     - match: grain
@@ -18,7 +18,7 @@ base:
     - openstack
     - openstack.client
     - openstack.rc
- 
+
   'roles:openstack_controller':
     - match: grain
     - users
@@ -32,6 +32,7 @@ base:
     - openstack.glance
     - openstack.nova_service
     - openstack.neutron_controller
+    - openstack.horizon
 
   'roles:openstack_network':
     - match: grain

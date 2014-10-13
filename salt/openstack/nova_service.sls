@@ -281,6 +281,8 @@ nova_identity_service:
     - description: 'OpenStack Compute'
     - connection_token: {{ admin_token }}
 
+# TODO: service-id gets set automatically?
+
 nova_api_endpoint:
   keystone.endpoint_present:
     - name: nova
