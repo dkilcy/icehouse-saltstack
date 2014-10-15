@@ -33,6 +33,7 @@ base:
     - openstack.nova_service
     - openstack.neutron_controller
     - openstack.horizon
+    - openstack.ceilometer_controller
 
   'roles:openstack_network':
     - match: grain

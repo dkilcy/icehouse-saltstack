@@ -1,4 +1,6 @@
 
+# openssl rand -hex 10
+
 openstack:
   METADATA_SECRET: 0cb2bb516881d71eff88
   ADMIN_TOKEN: 016389abda0579b560c0
@@ -11,6 +13,9 @@ openstack:
   NOVA_PASS: a1b587dd687cff6a6dff
   NEUTRON_DBPASS: f06432c2e047666d99e3
   NEUTRON_PASS: b398f7d80d20b77e238c
+  CEILOMETER_DBPASS: d362029dfe2f632aaa12
+  CEILOMETER_PASS: ec22dad96a2ae8306e32
+  CEILOMETER_TOKEN: cbe70c2dd0d2cecd84ba
 
   controller: controller-01
 

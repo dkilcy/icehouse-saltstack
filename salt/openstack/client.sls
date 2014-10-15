@@ -15,3 +15,7 @@ python-keystoneclient:
   pkg.installed:
     - name: python-keystoneclient
 
+python-ceilometerclient:
+  pkg.installed:
+  - name: python-ceilometerclient
+
