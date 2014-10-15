@@ -63,10 +63,8 @@ mongodb_conf_bindIp:
   file.replace:
     - name: /etc/mongodb.conf
     - path: /etc/mongodb.conf
-    - pattern: 'bindIp: 127.0.0.1'
-    - repl: 'bindIp: 0.0.0.0'
-
-# TODO: bind to just controller eth0?
+    - pattern: 'bind_ip = 127.0.0.1'
+    - repl: 'bind_ip = 0.0.0.0'
 
 ###
 # 4. Start the MongoDB server and configure it to start when the system boots:
@@ -84,14 +82,9 @@ mongodb_service_enabled_on_boot:
 # 5. Create the database and a ceilometer database user:
 ###
 
-mongodb_user:
-  mongodb_user.present:
-    - name: ceilometer
-    - passwd: {{ ceilometer_dbpass }}
-#    - user:
-#    - password:
-    - host: {{ mongodb_host }}
-    - database: ceilometer
+mongodb_user_create:
+  cmd.run:
+    - name: "mongo --host {{ controller }} --eval 'db = db.getSiblingDB(\"ceilometer\"); db.addUser({user: \"ceilometer\", pwd: \"{{ ceilometer_dbpass }}\", roles: [ \"readWrite\", \"dbAdmin\" ]})'"
 
 ###
 # 6. Configure the Telemetry service to use the database:
