@@ -61,8 +61,8 @@ dashboard_service:
   service.running:
     - name: {{ pillar['pkgs']['apache'] }}
     - enable: True
-    - watch: 
-      - file: /etc/openstack-dashboard/local_settings
+    - watch.file: 
+      - name: /etc/openstack-dashboard/local_settings
 
 dashboard_service_enabled_on_boot:
   service.enabled:
@@ -72,8 +72,8 @@ memcached_service:
   service.running:
     - name: memcached
     - enable: True
-    - watch: 
-      - file: /etc/openstack-dashboard/local_settings
+    - watch.file:
+      - name: /etc/openstack-dashboard/local_settings
 
 memcached_service_enabled_on_boot:
   service.enabled:
