@@ -88,7 +88,7 @@ ceilometer_compute_conf_6:
 # 3. Restart the Compute service:
 ###
 
-nova_compute_service:
+nova_ceilometer_compute_service:
   service.running:
     - name: openstack-nova-compute
     - enable: True

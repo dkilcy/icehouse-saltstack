@@ -34,6 +34,7 @@ base:
     - openstack.neutron_controller
     - openstack.horizon
     - openstack.ceilometer_controller
+    - openstack.ceilometer_glance
 
   'roles:openstack_network':
     - match: grain
@@ -51,4 +52,5 @@ base:
     - openstack
     - openstack.nova_compute
     - openstack.neutron_compute
+    - openstack.ceilometer_compute
 
