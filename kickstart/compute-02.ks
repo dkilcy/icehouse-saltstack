@@ -34,6 +34,10 @@ poweroff
 /usr/bin/curl >> /root/post.out 2>&1
 /usr/bin/python --version >> /root/post.out 2>&1
 
+sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0
+#sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth1
+sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth2
+
 # Replace /etc/resolv.conf
 echo "
 search mgmt
@@ -165,5 +169,7 @@ crypto-utils
 hmaccalc
 net-snmp-python
 python-dmidecode
+-kexec-tools
+-NetworkManager
 
 %end

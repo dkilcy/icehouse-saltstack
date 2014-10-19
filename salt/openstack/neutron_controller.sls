@@ -359,7 +359,7 @@ neutron_controller_conf_26:
     - value: 'True'
 
 ###
-# configure Compute to use Networking
+# To configure Compute to use Networking
 ###
 
 neutron_controller_conf_27:

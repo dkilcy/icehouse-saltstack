@@ -9,7 +9,7 @@ lang en_US
 keyboard us
 
 network --onboot yes --device eth0 --bootproto static --ip=10.0.0.21 --netmask 255.255.255.0 
-#network --onboot yes --device eth1 
+network --onboot yes --device eth1 --bootproto none 
 network --onboot yes --device eth2 --bootproto static --ip=10.0.1.21 --netmask 255.255.255.0
 
 rootpw --iscrypted $1$wMcywtdb$LBktYhg.JmHsm2gOf7OaT/
@@ -34,6 +34,10 @@ poweroff
 /usr/sbin/dmidecode -s 'baseboard-serial-number' >> /root/post.out d2>&1
 /usr/bin/curl >> /root/post.out 2>&1
 /usr/bin/python --version >> /root/post.out 2>&1
+
+sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth0
+sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth1
+sed -i 's/NM_CONTROLLED=.*/NM_CONTROLLED=no/g' /etc/sysconfig/network-scripts/ifcfg-eth2
 
 # Replace /etc/resolv.conf
 echo "
@@ -167,5 +171,7 @@ crypto-utils
 hmaccalc
 net-snmp-python
 python-dmidecode
+-kexec-tools
+-NetworkManager
 
 %end
