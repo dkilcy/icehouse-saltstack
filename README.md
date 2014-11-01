@@ -1,4 +1,7 @@
-# openstack-saltstack
+# icehouse-saltstack
+
+CentOS 6.5 version
+New projct is juno-saltstack
 
 ## Mission statement
 
