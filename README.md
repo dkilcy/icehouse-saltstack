@@ -7,20 +7,6 @@ New projct is juno-saltstack
 
 Setup an OpenStack private cloud multi-node architecture with OpenStack Neutron Networking from unboxing to production.
 
-SaltStack will be used to automate the deployment of the controller, network and multiple compute nodes.
-
-The first phase of the project will bootstrap the initial multi-node architecture.
-
-Additional phases will include:
-- Redundant controller and network nodes for HA/disaster recovery and performance
-- Swift and Cinder Object/Block storage
-- Celiometer and Horizon 
-- Ethernet bonding
-
-I started this project because of the lack of information about Neutron networking and setting up OpenStack in real production environments.  Sure you can use "devstack" to do the work for you, but it does not mimic a real production setup.  In addition I wanted to install and configure each of the components manually to get a better understanding of the ecosystem, and to do it in an automated and reproducable way.  By authoring my own Salt formulas for deployment the ultimate goal is to be able to deploy an entire OpenStack ecosystem ranging from 3 to 3000 systems with a single Salt highstate command.
-
-To sum it up, I view "devstack" as reading a book about math.  You do not learn math unless you actually work the problems.  Thus the catalyst for this project.
-
 ## Overview
 
 * OpenStack Icehouse release
