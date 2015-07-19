@@ -1,7 +1,9 @@
 # icehouse-saltstack
 
+This project **Deprecated** and no longer being actively maintained. OpenStack Kilo is out.  See [dkilcy/kilo-saltstack](https://github.com/dkilcy/kilo-saltstack)
+
+
 CentOS 6.5 version
-New projct is juno-saltstack
 
 ## Mission statement
 
